@@ -1,5 +1,11 @@
-$("#btnSaveItem").click(function () {
-    let product = {
+$('#btnSaveItem').click(function () {
+    if(checkIfValidItem()){
+        saveItem();
+    }
+});
+
+function saveItem() {
+    let item = {
         id: $("#txtItemCode").val(),
         name: $("#txtItemName").val(),
         qty: $("#txtItemQty").val(),
@@ -9,36 +15,39 @@ $("#btnSaveItem").click(function () {
         url: "http://localhost:8080/backendArtifact/item",
         method: "POST",
         contentType: "application/json",
-        data: JSON.stringify(product),
+        data: JSON.stringify(item),
         success: function (resp) {
             if (resp.status == 200) {
-                swal("Successful!", resp.message, "success");
+                //swal("Successful!", resp.message, "success");
                 loadAllItems();
             } else {
-                swal("Unsuccessful!", resp.message, "error");
+                //swal("Unsuccessful!", resp.message, "error");
             }
         }
     });
-});
+}
 
-$("#btnUpdateItem").click(function () {
-    let product = {
+$('#btnUpdateItem').click(function () {
+    let item = {
         id: $("#txtItemCode").val(),
         name: $("#txtItemName").val(),
         qty: $("#txtItemQty").val(),
         price: $("#txtItemPrice").val()
     }
+    console.log(item);
     $.ajax({
         url: "http://localhost:8080/backendArtifact/item",
         method: "PUT",
         contentType: "application/json",
-        data: JSON.stringify(product),
+        data: JSON.stringify(item),
         success: function (resp) {
             if (resp.status == 200) {
-                swal("Successful!", resp.message, "success");
+
+                console.log(resp);
+                //swal("Successful!", resp.message, "success");
                 loadAllItems();
             } else {
-                swal("Unsuccessful!", resp.message, "error");
+                //swal("Unsuccessful!", resp.message, "error");
             }
         }
     });
@@ -75,24 +84,10 @@ $("#btnSearchItem").click(function () {
                     $("#txtItemQty").val(res.data.qty);
                     $("#txtItemPrice").val(res.data.price);
             } else {
-                swal("Unsuccessful!", res.message, "error");
+                //swal("Unsuccessful!", res.message, "error");
             }
         }
     });
-    //
-    // if (!res) {
-    //     clearAllItem();
-    //     alert("No Such a Item");
-    // } else {
-    //     $("#addNewItemModal").modal('show');
-    //     console.log(res.getItemId());
-    //
-    //     $("#txtItemCode").val(res.getItemId());
-    //     $("#txtItemName").val(res.getItemName());
-    //     $("#txtItemQty").val(res.getItemQty());
-    //     $("#txtItemPrice").val(res.getItemPrice());
-    //
-    // }
 });
 
 $("#btnItemDelete").click(function () {
@@ -102,10 +97,10 @@ $("#btnItemDelete").click(function () {
         method: "DELETE",
         success: function (resp) {
             if (resp.status == 200) {
-                swal("Successful!", resp.message, "success");
+                //swal("Successful!", resp.message, "success");
                 loadAllItems();
             } else {
-                swal("Unsuccessful!", resp.message, "error");
+                //swal("Unsuccessful!", resp.message, "error");
             }
         }
     });
@@ -135,15 +130,6 @@ $("#txtItemCode").on('keyup', function (eventOb) {
     if (eventOb.key == "Enter") {
         checkIfValidItem();
     }
-
-    // if (eventOb.key == "Control") {
-    //     var typedItemCode = $("#txtItemCode").val();
-    //     var srcItem = searchItem(typedItemCode);
-    //     $("#txtItemCode").val(srcItem.getItemId());
-    //     $("#txtItemName").val(srcItem.getItemName());
-    //     $("#txtItemQty").val(srcItem.getItemQty());
-    //     $("#txtItemPrice").val(srcItem.getItemPrice());
-    // }
 });
 
 $("#txtItemName").on('keyup', function (eventOb) {
@@ -260,6 +246,3 @@ function setItemButton() {
     }
 }
 
-$('#btnSaveItem').click(function () {
-    checkIfValidItem();
-});
