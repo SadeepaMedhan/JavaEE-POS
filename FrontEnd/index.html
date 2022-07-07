@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/css/fonts/css/all.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <style>
         .label-one {
             background: #53A57F;
@@ -396,7 +397,7 @@
                             <option>NIC</option>
                         </select>
                     </div>
-                    <button class="btn btn-secondary">Clear</button>
+                    <button id="btnClearSearch" type="button" class="btn btn-secondary">Clear</button>
                     <button id="btnSearchCus" type="button" class="btn btn-primary">Search</button>
                 </fieldset>
             </form>
@@ -404,7 +405,7 @@
         <div class="col-6 col-12 col-sm-12 col-md-8 col-lg-4 col-xl-3 my-2">
             <button id="openAddNewCustomer" type="button" class="btn btn-primary" data-bs-toggle="modal"
                     data-bs-target="#cusDetailPopup"
-                    data-bs-whatever="@getbootstrap">New Customer
+                    data-bs-whatever="@getbootstrap" onclick="{saveStatus = true;}">New Customer
             </button>
 
             <div class="modal fade" id="cusDetailPopup" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -419,22 +420,22 @@
                             <form id="customerForm">
                                 <div class="mb-3">
                                     <label for="txtCusID" class="col-form-label">Customer ID:</label>
-                                    <input type="text" class="form-control" id="txtCusID">
+                                    <input type="text" class="form-control" id="txtCusID" name="cusId">
                                     <p><small class="text-danger pl-1" id="lblcusid"></small></p>
                                 </div>
                                 <div class="mb-3">
                                     <label for="txtCusName" class="col-form-label">Customer Name:</label>
-                                    <input type="text" class="form-control" id="txtCusName">
+                                    <input type="text" class="form-control" id="txtCusName" name="cusName">
                                     <p><small class="text-danger pl-1" id="lblcusname"></small></p>
                                 </div>
                                 <div class="mb-3">
                                     <label for="txtCusAddress" class="col-form-label">Customer Address:</label>
-                                    <input type="text" class="form-control" id="txtCusAddress">
+                                    <input type="text" class="form-control" id="txtCusAddress" name="cusAddress">
                                     <p><small class="text-danger pl-1" id="lblcusaddress"></small></p>
                                 </div>
                                 <div class="mb-3">
                                     <label for="txtCusTP" class="col-form-label">Customer Telephone:</label>
-                                    <input type="text" class="form-control" id="txtCusTP">
+                                    <input type="text" class="form-control" id="txtCusTP" name="cusContact">
                                     <p><small class="text-danger pl-1" id="lblcustp"></small></p>
                                 </div>
                             </form>
@@ -443,11 +444,14 @@
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="btnCusDelete">
                                 Delete
                             </button>
+                            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" id="btnUpdateCus">
+                                Update
+                            </button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnClear">
                                 Clear
                             </button>
                             <button type="button" class="btn btn-primary" id="btnSaveCustomer" data-bs-dismiss="modal">
-                                Save & Update
+                                Save
                             </button>
                         </div>
                     </div>
@@ -490,7 +494,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="btnUpdateCus" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Update
+                    <button id="btnUpdateCusDetail" type="button" class="btn btn-primary" data-bs-dismiss="modal">Update
                     </button>
                 </div>
             </div>

@@ -1,33 +1,34 @@
-$("#btnSaveCustomer").click(function () {
-    // let newCustomer = new CustomerDTO($("#txtCusID").val(), $("#txtCusName").val(), $("#txtCusAddress").val(), $("#txtCusTP").val());
-    // if (!searchCustomer($("#txtCusID").val())) {
-    //     if (checkIfValid()) {
-    //         saveCustomer(newCustomer);
-    //         clearAll();
-    //         loadAllCustomers();
-    //     }
-    // } else {
-    //     $("#errorPopup").modal('show');
-    // }
 
+let updateStatus = false;
+let saveStatus = false;
+
+$('#btnSaveCustomer').click(function () {
+    if(checkIfValid()){
+        saveCus();
+    }
+});
+
+function saveCus() {
     let serialize = $("#customerForm").serialize();
     $.ajax({
         url: "http://localhost:8080/backendArtifact/customer",
         method: "POST",
         data: serialize,
         success: function (resp) {
+            console.log(serialize);
             console.log(resp);
             loadAllCustomers();
+            saveStatus = false;
         }
     });
-});
+}
 
 $("#btnUpdateCus").click(function () {
     let customer = {
-        id: $("#txtCusId").val(),
+        id: $("#txtCusID").val(),
         name: $("#txtCusName").val(),
         address: $("#txtCusAddress").val(),
-        contact: $("#txtCusContact").val()
+        contact: $("#txtCusTP").val()
     }
     $.ajax({
         url: "http://localhost:8080/backendArtifact/customer",
@@ -36,16 +37,16 @@ $("#btnUpdateCus").click(function () {
         data: JSON.stringify(customer),
         success: function (resp) {
             if (resp.status == 200) {
-                swal("Successful!", resp.message, "success");
-                loadCustomers();
+                //swal("Successful!", resp.message, "success");
+                loadAllCustomers();
+                $('#txtSearchCusID').val("")
+                clearAll();
+                updateStatus = false;
             } else {
-                swal("Unsuccessful!", resp.message, "error");
+                //swal("Unsuccessful!", resp.message, "error");
             }
         }
     });
-        loadAllCustomers();
-        clearAll();
-
 });
 
 function loadAllCustomers() {
@@ -65,43 +66,41 @@ function loadAllCustomers() {
 
 // search customer
 $("#btnSearchCus").click(function () {
-    //
-    // var searchID = $("#txtSearchCusID").val();
-    // var response = searchCustomer(searchID);
-    //
-    // if (!response) {
-    //     clearAll();
-    //     alert("No Such a Customer");
-    // } else {
-    //     $("#cusDetailPopup").modal('show');
-    //     //console.log(response.getCusId());
-    //
-    //     $("#txtCusID").val(response.getCusId());
-    //     $("#txtCusName").val(response.getCusName());
-    //     $("#txtCusAddress").val(response.getCusAddress());
-    //     $("#txtCusTP").val(response.getCusTp());
-    //
-    // }
+    var searchID = $("#txtSearchCusID").val();
+
+    $.ajax({
+        url: "http://localhost:8080/backendArtifact/customer?case=getCustomer&id=" + searchID,
+        method: "GET",
+        success: function (res) {
+            if (res.status == 200) {
+                $("#cusDetailPopup").modal('show');
+                console.log(res);
+
+                $("#txtCusID").val(res.data.id);
+                $("#txtCusName").val(res.data.name);
+                $("#txtCusAddress").val(res.data.address);
+                $("#txtCusTP").val(res.data.contact);
+                updateStatus = true;
+                saveStatus = false;
+            } else {
+                //swal("Unsuccessful!", res.message, "error");
+            }
+        }
+    });
 });
 
 $("#btnCusDelete").click(function () {
-    // if (!searchCustomer($("#txtCusID").val())) {
-    //     let searchId = $("#txtCusID").val();
-    //     clearAll();
-    //     $("#txtCusID").val(searchId);
-    //     checkIfValid();
-    // }else {
-    //     deleteCustomer($("#txtCusID").val());
-    // }
     $.ajax({
         url: "http://localhost:8080/backendArtifact/customer?cusId=" + $("#txtCusID").val(),
         method: "DELETE",
         success: function (resp) {
             if (resp.status == 200) {
-                swal("Successful!", resp.message, "success");
-                loadCustomers();
+                //swal("Successful!", resp.message, "success");
+                loadAllCustomers();
+                $('#txtSearchCusID').val("")
+                clearAll();
             } else {
-                swal("Unsuccessful!", resp.message, "error");
+                //swal("Unsuccessful!", resp.message, "error");
             }
         }
     });
@@ -134,7 +133,7 @@ $("#txtCusID").on('keyup', function (eventOb) {
 
     if (eventOb.key == "Control") {
         var typedCustomerID = $("#txtCusID").val();
-        var srcCustomer = searchCustomer(typedCustomerID);
+        // var srcCustomer = searchCustomer(typedCustomerID);
         // $("#txtCusID").val(srcCustomer.getCustomerID());
         // $("#txtCusName").val(srcCustomer.getCustomerName());
         // $("#txtCusAddress").val(srcCustomer.getCustomerAddress());
@@ -164,13 +163,15 @@ $("#txtCusTP").on('keyup', function (eventOb) {
 });
 // focusing events end
 $("#btnSaveCustomer").attr('disabled', true);
+$("#btnUpdateCus").attr('disabled', true);
 
 function clearAll() {
     $('#txtCusID,#txtCusName,#txtCusAddress,#txtCusTP').val("");
     $('#txtCusID,#txtCusName,#txtCusAddress,#txtCusTP').css('border', '2px solid #ced4da');
     $('#txtCusID').focus();
     $("#btnSaveCustomer").attr('disabled', true);
-    loadAllCustomers();
+    $("#btnUpdateCus").attr('disabled', true);
+    //loadAllCustomers();
     $("#lblcusid,#lblcusname,#lblcusaddress,#lblcustp").text("");
 }
 
@@ -247,12 +248,11 @@ function checkIfValid() {
 function setButton() {
     let b = formValid();
     if (b) {
-        $("#btnSaveCustomer").attr('disabled', false);
+        if (saveStatus){$("#btnSaveCustomer").attr('disabled', false);}
+        if (updateStatus){$("#btnUpdateCus").attr('disabled', false);}
     } else {
         $("#btnSaveCustomer").attr('disabled', true);
+        $("#btnUpdateCus").attr('disabled', true);
     }
 }
 
-$('#btnSaveCustomer').click(function () {
-    checkIfValid();
-});
