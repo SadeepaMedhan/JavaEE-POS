@@ -3,11 +3,70 @@ function loadCusIds() {
     loadCusDetails(select.options[select.selectedIndex].value);
 }
 
+function loadAllCusID() {
+    $("#inputCustomer").empty();
+    $("#inputCustomer").append(`<option value="" disabled selected hidden>Select ID</option>`);
+    $.ajax({
+        url: "http://localhost:8080/backendArtifact/customer?case=allID",
+        method: "GET",
+        success: function (resp) {
+            for (let id of resp.data) {
+                let cusID = `<option value="${id.id}">${id.id}</option>`;
+                $("#inputCustomer").append(cusID);
+            }
+        }
+    });
+}
+
+function loadCusDetails(id) {
+    $.ajax({
+        url: "http://localhost:8080/backendArtifact/customer?case=getCustomer&id=" + id,
+        method: "GET",
+        success: function (resp) {
+            $("#txtOrderCusID").val(resp.data.id);
+            $("#txtOrderCusName").val(resp.data.name);
+            $("#txtOrderCusAddress").val(resp.data.address);
+            $("#txtOrderCusTP").val(resp.data.contact);
+        }
+    });
+}
+
+//----item---
 function loadItemCodes() {
     var select = document.getElementById("inputItem");
     loadItemDetails(select.options[select.selectedIndex].value);
     $("#txtOrderItemCode").css('border', '2px solid #ced4da');
 }
+
+function loadAllItemID() {
+    $("#inputItem").empty();
+    $("#inputItem").append(`<option value="" disabled selected hidden>Select ID</option>`);
+    $.ajax({
+        url: "http://localhost:8080/backendArtifact/item?case=allID",
+        method: "GET",
+        success: function (resp) {
+            for (let id of resp.data) {
+                let itemID = `<option value="${id.id}">${id.id}</option>`;
+                $("#inputItem").append(itemID);
+            }
+        }
+    });
+}
+
+function loadItemDetails(id) {
+    $.ajax({
+        url: "http://localhost:8080/backendArtifact/item?case=getItem&id=" + id,
+        method: "GET",
+        success: function (res) {
+            $("#txtOrderItemCode").val(res.data.id);
+            $("#txtOrderItemName").val(res.data.name);
+            $("#txtOrderQtyOnHand").val(res.data.qty);
+            $("#txtOrderItemPrice").val(res.data.price);
+        }
+    });
+}
+
+
 
 $("#btnAddToCart").click(function () {
     var itemCode = $("#txtOrderItemCode").val();

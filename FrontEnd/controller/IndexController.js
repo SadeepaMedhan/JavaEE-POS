@@ -34,8 +34,8 @@ $("#orderPage").click(function () {
 
     $("#orderListSection").css("display", "none");
     $("#orderList").css("fontWeight", "normal");
-    // loadAllCusID();
-    // loadAllItemID();
+    loadAllCusID();
+    loadAllItemID();
     // getOrderID();
 });
 
