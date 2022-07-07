@@ -25,6 +25,28 @@ public class OrderServlet extends HttpServlet {
     @Resource(name = "java:comp/env/jdbc/pool")
     DataSource ds;
     private final OrderBO orderBO = (OrderBO) BoFactory.getBOFactory().getBO(BoFactory.BoTypes.PLACE_ORDER);
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String option = req.getParameter("case");
+        switch (option) {
+            case "allOrders": {
+                //
+                break;
+            }
+            case "getOrderID": {
+                try {
+                    final Connection connection = ds.getConnection();
+                    String orderId = orderBO.getOrderId(connection);
+                } catch (SQLException | ClassNotFoundException throwables) {
+                    throwables.printStackTrace();
+                }
+                break;
+            }
+        }
+
+    }
+
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doPut(req, resp);
@@ -45,16 +67,30 @@ public class OrderServlet extends HttpServlet {
         SimpleDateFormat sdf=new SimpleDateFormat("hh:mm:ss a");
 
         ArrayList<ItemDetailsDTO> items=new ArrayList<>();
+        System.out.println("order received");
+
 
 
         try {
             final Connection connection = ds.getConnection();
-            String id=orderBO.getOrderId(connection);
+            String oId=orderBO.getOrderId(connection);
             for (JsonValue jsonValue:jsItems) {
                 JsonObject jsonObject = jsonValue.asJsonObject();
-                items.add(new ItemDetailsDTO(jsonObject.getString("id"),id,Double.parseDouble(jsonObject.getString("price")),Integer.parseInt(jsonObject.getString("qyt")),Double.parseDouble(jsonObject.getString("cost"))));
+
+                System.out.println(jsonObject);
+
+                String itemID = jsonObject.getString("id");
+                double price = Double.parseDouble(jsonObject.getString("price"));
+                int qty = Integer.parseInt(jsonObject.getString("qyt"));
+                double total = Double.parseDouble(jsonObject.getString("cost"));
+
+                System.out.println(itemID+"-"+price+"-"+qty+"-"+total);
+
+                items.add(new ItemDetailsDTO(itemID,oId,price,qty,total));
+                System.out.println(jsonObject.getString("id"));
+                System.out.println(oId);
             }
-            OrderDTO orderDTO=new OrderDTO(id,cusId,f.format(date),sdf.format(new Date()),Double.parseDouble(totalCost),Double.parseDouble(discount),items);
+            OrderDTO orderDTO=new OrderDTO(oId,cusId,f.format(date),sdf.format(new Date()),Double.parseDouble(totalCost),Double.parseDouble(discount),items);
             System.out.println(orderBO.saveOrder(orderDTO,connection));
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();

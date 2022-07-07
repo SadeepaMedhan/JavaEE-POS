@@ -33,8 +33,8 @@ public class OrderDAOImpl implements OrderDAO {
         connection.setAutoCommit(false);
         try{
             System.out.println(orderDTO.getOrderId());
-            if (CrudUtil.executeUpdate("INSERT INTO `Order` VALUES (?,?,?,?,?,?)",connection, orderDTO.getOrderId(), orderDTO.getCustomerId()
-                    , orderDTO.getOrderDate(), orderDTO.getOrderTime(), orderDTO.getCost(),orderDTO.getDiscount()) && orderDetailDAO.add(orderDTO.getItems(),connection)){
+            if (CrudUtil.executeUpdate("INSERT INTO `Order` VALUES (?,?,?,?,?)",connection, orderDTO.getOrderId(), orderDTO.getCustomerId()
+                    , orderDTO.getOrderDate(), orderDTO.getOrderTime(), orderDTO.getCost()) && orderDetailDAO.add(orderDTO.getItems(),connection)){
                 connection.commit();
                 check=1;
             }else {

@@ -1,3 +1,7 @@
+
+let cartList = [];
+
+
 function loadCusIds() {
     var select = document.getElementById("inputCustomer");
     loadCusDetails(select.options[select.selectedIndex].value);
@@ -79,9 +83,9 @@ $("#btnAddToCart").click(function () {
         $("#txtOrderItemCode").css('border', '2px solid #ced4da');
         if (regExItemQty.test(orderQty)) {
 
-            var itemTotal = itemPrice * orderQty;
-            let newItemToCart = new Cart(itemCode, orderQty, itemTotal);
-            addCart(newItemToCart);
+            let itemTotal = itemPrice * orderQty;
+            let newItemToCart = new CartItem(itemCode, itemName, itemQty, itemPrice, orderQty, itemTotal);
+            cartList.push(newItemToCart);
             loadCartAll();
 
             $("#txtOrderQty").css('border', '2px solid #ced4da');
@@ -95,31 +99,32 @@ $("#btnAddToCart").click(function () {
 });
 
 function removeCartItem(code) {
-    for (let i of cartDB) {
-        if (i.getCItemCode() === code) {
-            cartDB.splice(i, 1);
+    for (let i of cartList) {
+        if (i.getItemId() === code) {
+            cartList.splice(i, 1);
         }
     }
 }
 
+
 function loadCartAll() {
 
     $("#tableCart").empty();
-    for (var i of cartDB) {
-        let item = searchItem(i.getCItemCode());
+    for (let item of cartList) {
+
         $("#btnRemove").click(function () {
             let res = confirm("Do you need to Remove this Item..?");
             if (res) {
-                removeCartItem(i.getCItemCode());
+                removeCartItem(item.getItemId());
                 loadCartAll();
             }
         });
         let row = `<tr>
-                    <td>${i.getCItemCode()}</td>
+                    <td>${item.getItemId()}</td>
                     <td>${item.getItemName()}</td>
                     <td>${item.getItemPrice()}</td>
-                    <td>${i.getQtyForSale()}</td>
-                    <td>${i.getTotPrice()}</td>
+                    <td>${item.getQtyForSale()}</td>
+                    <td>${item.getTotPrice()}</td>
                     <td><button id="btnRemove" type="button" className="btn-sm">X</button></td>
                     </tr>`;
 
@@ -140,18 +145,41 @@ function calculate() {
 
 
 $("#btnPurchase").click(function () {
-    var list = Array();
-    for (let item of cartDB) {
-        list.push(item);
+    var discount = 0;
+    let items = [];
+
+    for (var i of cartList) {
+        let item = {
+            id: i.getItemId(),
+            qyt: i.getQtyForSale(),
+            price:i.getItemPrice(),
+            cost: i.getTotPrice()
+        }
+        items.push(item);
     }
-    var newOrder = new OrderDTO($("#lblOrderID").text(), $("#txtOrderCusID").val(), "2022/03/14", "12:06", getTotal(), list);
-    saveOrder(newOrder);
+    let order = {
+        cusId: $("#txtOrderCusID").val(),
+        items: items,
+        totalCost: getTotal(),
+        discount:discount
+    }
+
+    $.ajax({
+        url: "http://localhost:8080/backendArtifact/order",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(order),
+        success: function () {
+
+        }
+    });
+
     clearAllOrder();
 });
 
 function getTotal() {
-    var total = 0;
-    for (var i of cartDB) {
+    let total = 0;
+    for (let i of cartList) {
         total += i.getTotPrice();
     }
     return total;
@@ -159,18 +187,18 @@ function getTotal() {
 
 function clearAllOrder() {
     $("#tableCart").empty();
-    cartDB.splice(0, cartDB.length);
+    cartList.splice(0, cartList.length);
     calculate();
-    getOrderID();
+    //getOrderID();
 }
 
 function loadAllOrders() {
     $("#tableOrderList").empty();
-    for (var i of orderDB) {
-        let itemQty = i.getCart().length;
-        let row = `<tr><td>${i.getOrderId()}</td><td>${i.getCustomerId()}</td><td>${itemQty}</td><td>${i.getDate()}</td><td>${i.getTotal()}</td></tr>`;
-        $("#tableOrderList").append(row);
-    }
+    // for (var i of orderDB) {
+    //     let itemQty = i.getCart().length;
+    //     let row = `<tr><td>${i.getOrderId()}</td><td>${i.getCustomerId()}</td><td>${itemQty}</td><td>${i.getDate()}</td><td>${i.getTotal()}</td></tr>`;
+    //     $("#tableOrderList").append(row);
+    // }
 }
 
 
